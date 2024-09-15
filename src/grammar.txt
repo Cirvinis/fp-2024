@@ -1,0 +1,9 @@
+<file_system> ::= <directory> | <directory> <file_system>
+<directory> ::= "Directory:" <name> <contents>
+<contents> ::= <file> | <directory>
+<file> ::= "File:" <name> "Size:" <number>
+<name> ::= <string>
+<string> ::= '"' <char>* '"'
+<char> ::= 'a' | 'b' | 'c' | ... | 'z' | 'A' | 'B' | ... | 'Z' | '0' | '1' | ... | '9' | ' '
+<number> ::= <digit>+
+<digit> ::= '0' | '1' | '2' | ... | '9'
