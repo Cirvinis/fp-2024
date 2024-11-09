@@ -1,8 +1,20 @@
 <file_system> ::= <directory> | <directory> <file_system>
-<directory> ::= "Directory:" <name> <contents>
-<contents> ::= <file> | <directory>
-<file> ::= "File:" <name> "Size:" <number>
-<name> ::= <string>
+<directory> ::= <directoryName> <contents>
+<directoryName> ::= <string>
+<contents> ::= [<file>]
+<functions> ::=
+"create file " <file> <directoryName> | 
+"create directory " <directoryName> | 
+"delete file " <fileName> <directoryName> | 
+"delete directory " <directoryName> |
+"change file size " <directoryName> <fileName> <size> |
+"show directory " <directoryName> |
+"show filesystem " <[directoryName<[file]>]>
+"view"
+
+<file> ::= <fileName> <fileSize>
+<fileName> ::= <string>
+<fileSize> ::= <number>
 <string> ::= '"' <char>* '"'
 <char> ::= 'a' | 'b' | 'c' | ... | 'z' | 'A' | 'B' | ... | 'Z' | '0' | '1' | ... | '9' | ' '
 <number> ::= <digit>+

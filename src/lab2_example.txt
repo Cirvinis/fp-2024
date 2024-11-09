@@ -1,0 +1,75 @@
+example 1:
+
+create directory directoryA
+Directory directoryA created.
+
+view
+Current file system: 
+[Directory: directoryA
+  No files]
+
+create file fileA 10 directoryA
+File fileA of size 10 created in directory directoryA.
+
+view
+Current file system: 
+[Directory: directoryA
+  File: fileA (Size: 10 bytes)
+]
+
+create file fileB 20 directoryB
+ERROR:Directory directoryB does not exist.
+
+delete file fileB directoryB
+ERROR:Directory directoryB does not exist.
+
+delete file fileB directoryA
+ERROR:File fileB does not exist in directory directoryA.
+
+create file fileB 20 directoryA
+File fileB of size 20 created in directory directoryA.
+
+view
+Current file system:
+ [Directory: directoryA
+  File: fileB (Size: 20 bytes)
+  File: fileA (Size: 10 bytes)
+]
+
+delete directory directoryA
+Directory directoryA deleted.
+
+view
+Current file system:
+ []
+
+example 2:
+create directory directoryA
+create directory directoryB
+create file fileA 10 directoryA
+create file fileB 20 directoryA
+create file fileC 30 directoryB
+view
+Current file system:
+ [Directory: directoryB
+  File: fileC (Size: 30 bytes)
+,Directory: directoryA
+  File: fileB (Size: 20 bytes)
+  File: fileA (Size: 10 bytes)
+]
+
+delete directory directoryB
+view
+Current file system:
+ [Directory: directoryA
+  File: fileB (Size: 20 bytes)
+  File: fileA (Size: 10 bytes)
+]
+
+change file size directoryA fileA 45
+view
+Current file system:
+ [Directory: directoryA
+  File: fileB (Size: 20 bytes)
+  File: fileA (Size: 45 bytes)
+]
