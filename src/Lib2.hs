@@ -24,6 +24,8 @@ module Lib2
     DirectoryName(..),
     Directory(..),
     FileSystem(..),
+    trim,
+    or2
     ) where
 
 
@@ -43,16 +45,14 @@ data DirectoryName = DirectoryName{
 data Directory = Directory{
   directoryName::String,
   files:: [File]
-}
+} deriving Eq
 
 data File = File{
   fileName:: String,
   fileSize:: Int
 }
 
-data FileSystem = FileSystem{
-  directories::[Directory]
-}
+data FileSystem = SingleDirectory Directory | DirectoryWithRest Directory FileSystem
 
 data Query = 
   CreateFile File DirectoryName |
@@ -83,6 +83,12 @@ parseNumber input =
   in if not (null digits)
        then Right (read digits, rest)
        else Left "Expected a number"
+
+mapParser :: (a -> b) -> Parser a -> Parser b
+mapParser f parser = \input -> case parser input of
+  Left err -> Left err
+  Right (result, rest) -> Right (f result, rest)
+
 
 instance Eq Query where
   (CreateFile file dir) == (CreateFile file' dir') = file == file' && dir == dir'
@@ -122,11 +128,11 @@ instance Show Directory where
 
 -- Show instance for FileSystem
 instance Show FileSystem where
-  show (FileSystem directories) =
-    "FileSystem contains:\n" ++
-    if null directories
-      then "  No directories"
-      else unlines (map (("  " ++) . show) directories)
+  show (SingleDirectory directory) =
+    "FileSystem contains:\n" ++ "  " ++ show directory
+  show (DirectoryWithRest directory rest) =
+    "FileSystem contains:\n" ++ "  " ++ show directory ++ "\n" ++ show rest
+
 
 parseFile :: Parser File
 parseFile input = 
@@ -148,8 +154,13 @@ parseDirectory =
 parseContents :: Parser [File]
 parseContents = many parseFile
 
-parseFileSystem :: Parser [Directory]
-parseFileSystem = many (parseDirectory)
+parseFileSystem :: Parser FileSystem
+parseFileSystem = 
+  or2
+    (mapParser SingleDirectory parseDirectory)
+    (and2 DirectoryWithRest parseDirectory parseFileSystem)
+
+
 
 many :: Parser a -> Parser [a]
 many p = many' p []
@@ -271,7 +282,7 @@ parseShowDirectory =
 parseShowFileSystem :: Parser Query
 parseShowFileSystem =
   and2
-  (\_ givenDirectories-> ShowFileSystem (FileSystem givenDirectories))
+  (\_ fileSystem-> ShowFileSystem fileSystem)
   (string "show filesystem ")
   parseFileSystem
 
@@ -306,7 +317,7 @@ trim = f . f
 -- as many as needed.
 data State = State {
   fileSystem :: [Directory]  -- List of top-level directories
-} deriving Show
+} deriving (Show, Eq)
 
 -- | Creates an initial program's state.
 -- It is called once when the program starts.

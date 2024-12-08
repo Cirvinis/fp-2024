@@ -19,3 +19,12 @@
 <char> ::= 'a' | 'b' | 'c' | ... | 'z' | 'A' | 'B' | ... | 'Z' | '0' | '1' | ... | '9' | ' '
 <number> ::= <digit>+
 <digit> ::= '0' | '1' | '2' | ... | '9'
+
+<batch> ::= 
+BEGIN 
+<query>;
+ <query>; 
+ ... 
+ END
+
+<query> ::= <individual query syntax>
