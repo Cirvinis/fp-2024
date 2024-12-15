@@ -1,0 +1,4 @@
+BEGIN
+create directory directoryTesting
+create file fileTesting 666 directoryTesting
+END

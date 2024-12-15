@@ -229,8 +229,35 @@ applyQuery state (Lib2.CreateFile file (Lib2.DirectoryName dirName)) =
   let fs = Lib2.fileSystem state
       updatedFS = map (updateDirectory dirName file) fs
   in state { Lib2.fileSystem = updatedFS }
+applyQuery state (Lib2.ChangeFileSize (Lib2.DirectoryName dirName) (Lib2.FileName fileName) newSize) =
+  let fs = Lib2.fileSystem state
+      updatedFS = map (changeFileSizeInDirectory dirName fileName newSize) fs
+  in state { Lib2.fileSystem = updatedFS }
+applyQuery state (Lib2.DeleteFile (Lib2.FileName fileName) (Lib2.DirectoryName dirName)) =
+  let fs = Lib2.fileSystem state
+      updatedFS = map (deleteFileFromDirectory dirName fileName) fs
+  in state { Lib2.fileSystem = updatedFS }
+applyQuery state (Lib2.DeleteDirectory (Lib2.DirectoryName dirName)) =
+  let fs = Lib2.fileSystem state
+      updatedFS = filter (\dir -> Lib2.directoryName dir /= dirName) fs
+  in state {Lib2.fileSystem = updatedFS}
 applyQuery state _ = state -- Handle other cases as needed
 
+changeFileSizeInDirectory :: String -> String -> Int -> Lib2.Directory -> Lib2.Directory
+changeFileSizeInDirectory targetDirName targetFileName newSize dir
+  | Lib2.directoryName dir == targetDirName =
+      dir { Lib2.files = map updateFileSize (Lib2.files dir) }
+  | otherwise = dir
+  where
+    updateFileSize file 
+      | Lib2.fileName file == targetFileName = file { Lib2.fileSize = newSize }
+      | otherwise = file
+
+deleteFileFromDirectory :: String -> String -> Lib2.Directory -> Lib2.Directory
+deleteFileFromDirectory targetDirName targetFileName dir
+  | Lib2.directoryName dir == targetDirName =
+      dir { Lib2.files = filter (\file -> Lib2.fileName file /= targetFileName) (Lib2.files dir) }
+  | otherwise = dir
 
 updateDirectory :: String -> Lib2.File -> Lib2.Directory -> Lib2.Directory
 updateDirectory targetDirName file dir

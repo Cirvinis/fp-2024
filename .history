@@ -1,0 +1,8 @@
+save
+delete directory directoryTesting
+load
+save
+delete file fileB directoryA
+save
+change file size directoryA fileA 321
+load
